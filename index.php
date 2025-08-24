@@ -227,6 +227,7 @@ try {
     </style>
 </head>
 <body>
+    <?php include 'header.php'; ?>
     <div class="login-status">
         <?php if (isset($_SESSION['username'])): ?>
             <span class="login-indicator indicator-logged"></span>
@@ -282,11 +283,9 @@ try {
         <?php endif; ?>
     </div>
     <!-- Main dashboard section (single instance) -->
+    <?php if (isset($_SESSION['username'])): ?>
     <div class="container">
-        <div class="header">
-            <h1 class="game-title">Exodus Genesis</h1>
-            <p class="subtitle">Space Exploration 1.01</p>
-        </div>
+    <!-- Header is now included from header.php -->
         <div class="realtime-section">
             <h2 class="section-title">
                 <?php
@@ -324,6 +323,7 @@ try {
             </div>
         </div>
     </div>
+    <?php endif; ?>
     <script>
         function updateResources() {
             // Add updating visual feedback
@@ -388,5 +388,6 @@ try {
             }
         });
     </script>
+    <?php include 'footer.php'; ?>
 </body>
 </html>
