@@ -231,33 +231,6 @@ try {
     </style>
 </head>
 <body>
-    <!-- Login Status Bar -->
-    <div id="login-status-bar" style="position:fixed;top:20px;right:30px;z-index:1000;text-align:right;">
-        <?php
-        session_start();
-        if (isset($_SESSION['username'])) {
-            $display_name = $_SESSION['display_name'] ?? $_SESSION['username'];
-            echo '<span style="color:#00ff88;font-weight:bold;"><span class="status-indicator"></span>' . htmlspecialchars($display_name) . '</span> ';
-            echo '<button id="logout-btn" style="margin-left:10px;padding:5px 12px;">Logout</button>';
-        } else {
-            echo '<button id="login-btn" style="padding:5px 12px;">Login</button>';
-        }
-        ?>
-    </div>
-
-    <!-- Login Modal -->
-    <div id="login-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:2000;align-items:center;justify-content:center;">
-        <div style="background:#222;padding:30px 40px;border-radius:12px;box-shadow:0 8px 32px #000;min-width:300px;max-width:90vw;">
-            <h2 style="color:#00d4ff;margin-bottom:18px;">Login</h2>
-            <form id="login-form">
-                <input type="text" name="username" placeholder="Username" required style="width:100%;margin-bottom:12px;padding:8px;">
-                <input type="password" name="password" placeholder="Password" required style="width:100%;margin-bottom:18px;padding:8px;">
-                <button type="submit" style="width:100%;padding:8px 0;background:#00d4ff;color:#fff;border:none;border-radius:6px;font-weight:bold;">Login</button>
-            </form>
-            <div id="login-error" style="color:#ff4e4e;margin-top:10px;display:none;"></div>
-        </div>
-    </div>
-
     <div class="container">
         <div class="header">
             <h1 class="game-title">Exodus Genesis</h1>
@@ -295,52 +268,6 @@ try {
     </div>
 
     <script>
-    // Login Modal Logic
-    const loginBtn = document.getElementById('login-btn');
-    const logoutBtn = document.getElementById('logout-btn');
-    const loginModal = document.getElementById('login-modal');
-    const loginForm = document.getElementById('login-form');
-    const loginError = document.getElementById('login-error');
-
-    if (loginBtn) {
-        loginBtn.onclick = function() {
-            loginModal.style.display = 'flex';
-        };
-    }
-    if (logoutBtn) {
-        logoutBtn.onclick = function() {
-            fetch('logout.php', { method: 'POST' })
-                .then(r => r.json())
-                .then(data => { window.location.reload(); });
-        };
-    }
-    if (loginModal) {
-        loginModal.onclick = function(e) {
-            if (e.target === loginModal) loginModal.style.display = 'none';
-        };
-    }
-    if (loginForm) {
-        loginForm.onsubmit = function(e) {
-            e.preventDefault();
-            loginError.style.display = 'none';
-            const formData = new FormData(loginForm);
-            fetch('login.php', { method: 'POST', body: formData })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        loginModal.style.display = 'none';
-                        window.location.reload();
-                    } else {
-                        loginError.textContent = data.error || 'Login failed.';
-                        loginError.style.display = 'block';
-                    }
-                })
-                .catch(() => {
-                    loginError.textContent = 'Server error.';
-                    loginError.style.display = 'block';
-                });
-        };
-    }
         function updateResources() {
             // Add updating visual feedback
             document.querySelectorAll('.stat-card').forEach(card => {
@@ -403,7 +330,6 @@ try {
                 updateResources();
             }
         });
-    </script>
     </script>
 </body>
 </html>
