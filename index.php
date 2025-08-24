@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Database configuration
 $host = '127.0.0.1';
 $dbname = 'mcg_test';
@@ -48,6 +49,227 @@ try {
     ];
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exodus Genesis - Space Exploration</title>
+    <style>
+        .login-status {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            background: rgba(30,30,40,0.95);
+            border-radius: 12px;
+            padding: 18px 28px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+            z-index: 100;
+            min-width: 220px;
+            text-align: right;
+        }
+        .login-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        .indicator-logged {
+            background: #00ff88;
+            box-shadow: 0 0 8px #00ff88;
+        }
+        .indicator-not {
+            background: #ff3c3c;
+            box-shadow: 0 0 8px #ff3c3c;
+        }
+        .login-status button, .login-status input[type="submit"] {
+            background: linear-gradient(45deg, #00d4ff, #ff0080);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 7px 18px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .login-status a {
+            color: #ffed4e;
+            text-decoration: underline;
+            margin-left: 10px;
+            font-size: 0.95rem;
+        }
+        .login-status form {
+            margin-top: 10px;
+        }
+        .login-status input[type="text"], .login-status input[type="password"] {
+            padding: 6px 10px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            margin-bottom: 7px;
+            width: 90%;
+            background: #222;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-status">
+        <?php if (isset($_SESSION['username'])): ?>
+            <span class="login-indicator indicator-logged"></span>
+            Logged in as <strong><?php echo htmlspecialchars($_SESSION['display_name'] ?? $_SESSION['username']); ?></strong><br>
+            <form method="post" action="logout.php" style="display:inline;">
+                <input type="submit" value="Logout">
+            </form>
+        <?php else: ?>
+            <span class="login-indicator indicator-not"></span>
+            <span style="color:#ff3c3c;font-weight:bold;">Not Logged In</span><br>
+            <button id="show-login-btn">Login</button>
+            <div id="login-form" style="display:none; margin-top:10px;">
+                <form method="post" action="login.php" id="loginForm">
+                    <input type="text" name="username" placeholder="Username" required><br>
+                    <input type="password" name="password" placeholder="Password" required><br>
+                    <input type="submit" value="Login">
+                </form>
+                <a href="register.php">Register a new account</a>
+                <div id="login-error" style="color:#ff3c3c; margin-top:7px;"></div>
+            </div>
+            <script>
+            // Show login form when button is clicked
+            document.getElementById('show-login-btn').onclick = function() {
+                document.getElementById('login-form').style.display = 'block';
+                this.style.display = 'none';
+            };
+            // Attach submit handler after DOM is loaded
+            document.addEventListener('DOMContentLoaded', function() {
+                var loginForm = document.getElementById('loginForm');
+                if (loginForm) {
+                    loginForm.onsubmit = function(e) {
+                        e.preventDefault();
+                        var formData = new FormData(loginForm);
+                        fetch('login.php', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                window.location.reload();
+                            } else {
+                                document.getElementById('login-error').textContent = data.error || 'Login failed.';
+                            }
+                        })
+                        .catch(() => {
+                            document.getElementById('login-error').textContent = 'Network error.';
+                        });
+                    };
+                }
+            });
+            </script>
+        <?php endif; ?>
+    </div>
+    <div class="container">
+        <div class="header">
+            <h1 class="game-title">Exodus Genesis</h1>
+            <p class="subtitle">Space Exploration 1.01</p>
+        </div>
+        
+        <div class="realtime-section">
+            <h2 class="section-title">Verbil's Resources</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="aetherite"><?php echo number_format($resources['aetherite'] ?? 0); ?></div>
+                    <div class="stat-label">Aetherite</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="crysalon"><?php echo number_format($resources['crysalon'] ?? 0); ?></div>
+                    <div class="stat-label">Crysalon</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="ignisium"><?php echo number_format($resources['ignisium'] ?? 0); ?></div>
+                    <div class="stat-label">Ignisium</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="veltrium"><?php echo ($resources['veltrium'] ?? 0); ?></div>
+                    <div class="stat-label">Veltrium</div>
+                </div>
+            </div>
+            
+            <div class="update-status">
+                <span class="status-indicator"></span>
+                <span id="update-text">Real-time updates active</span>
+                <span id="last-update">Last updated: <?php echo date('H:i:s'); ?></span>
+            </div>
+        </div>
+    </div>
+    <script>
+        function updateResources() {
+            // Add updating visual feedback
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.classList.add('updating');
+            });
+            
+            // Make AJAX request with better error handling
+            const formData = new FormData();
+            formData.append('player_id', '1');
+            
+            fetch('get_resources.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received data:', data);
+                console.log('Success flag:', data.success);
+                console.log('Resources:', data.resources);
+                
+                if (data.success) {
+                    // Update each resource value with smooth transition
+                    document.getElementById('aetherite').textContent = data.resources.aetherite.toLocaleString();
+                    document.getElementById('crysalon').textContent = data.resources.crysalon.toLocaleString();
+                    document.getElementById('ignisium').textContent = data.resources.ignisium.toLocaleString();
+                    document.getElementById('veltrium').textContent = data.resources.veltrium.toLocaleString();
+                    
+                    // Update timestamp
+                    document.getElementById('last-update').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+                    document.getElementById('update-text').textContent = 'Real-time updates active';
+                } else {
+                    console.error('Server error:', data.error);
+                    document.getElementById('update-text').textContent = 'Update failed - ' + (data.error || 'Unknown error');
+                }
+            }) // <-- Only one closing parenthesis here
+            .catch(error => {
+                console.error('Fetch error:', error);
+                document.getElementById('update-text').textContent = 'Connection error: ' + error.message;
+            })
+            .finally(() => {
+                // Remove updating visual feedback
+                document.querySelectorAll('.stat-card').forEach(card => {
+                    card.classList.remove('updating');
+                });
+            });
+        }
+
+        // Update resources every 1 second
+        setInterval(updateResources, 1000);
+
+        // Also update when page becomes visible (user switches back to tab)
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                updateResources();
+            }
+        });
+    </script>
+</body>
+</html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
