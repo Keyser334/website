@@ -169,15 +169,14 @@ try {
             </script>
         <?php endif; ?>
     </div>
+    <!-- Main dashboard section (single instance) -->
     <div class="container">
         <div class="header">
             <h1 class="game-title">Exodus Genesis</h1>
             <p class="subtitle">Space Exploration 1.01</p>
         </div>
-        
         <div class="realtime-section">
             <h2 class="section-title">Verbil's Resources</h2>
-            
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value" id="aetherite"><?php echo number_format($resources['aetherite'] ?? 0); ?></div>
@@ -196,7 +195,6 @@ try {
                     <div class="stat-label">Veltrium</div>
                 </div>
             </div>
-            
             <div class="update-status">
                 <span class="status-indicator"></span>
                 <span id="update-text">Real-time updates active</span>
