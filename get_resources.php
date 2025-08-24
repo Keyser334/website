@@ -31,8 +31,13 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     
-    // Hardcode player_id for testing
-    $player_id = 1;
+    // Use logged-in player's ID from session if available
+    session_start();
+    if (isset($_SESSION['player_id'])) {
+        $player_id = (int)$_SESSION['player_id'];
+    } else {
+        $player_id = 1; // fallback for not logged in
+    }
     // Query for normalized resources table - simplified approach
     $stmt = $pdo->prepare("
         SELECT resource_type, quantity 
