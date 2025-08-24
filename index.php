@@ -288,7 +288,17 @@ try {
             <p class="subtitle">Space Exploration 1.01</p>
         </div>
         <div class="realtime-section">
-            <h2 class="section-title">Verbil's Resources</h2>
+            <h2 class="section-title">
+                <?php
+                $dashboardName = 'Verbil';
+                if (isset($_SESSION['display_name'])) {
+                    $dashboardName = htmlspecialchars($_SESSION['display_name']);
+                } elseif (isset($_SESSION['username'])) {
+                    $dashboardName = htmlspecialchars($_SESSION['username']);
+                }
+                echo "{$dashboardName}'s Resources";
+                ?>
+            </h2>
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value" id="aetherite"><?php echo number_format($resources['aetherite'] ?? 0); ?></div>
