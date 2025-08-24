@@ -1,8 +1,10 @@
 <?php
 session_start();
-// Handle AJAX registration POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_SERVER['HTTP_ACCEPT']) || strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Always return JSON for POST requests
     header('Content-Type: application/json');
+    // Suppress any output before JSON
+    ob_start();
     $host = '127.0.0.1';
     $dbname = 'mcg_test';
     $username = 'clyde';
@@ -14,18 +16,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_SERVER['HTTP_ACCEPT']) || s
 
     // Basic validation
     if (!$username_in || !$email_in || !$password_in) {
+        ob_end_clean();
         echo json_encode(['success' => false, 'error' => 'All fields are required.']);
         exit;
     }
     if (!filter_var($email_in, FILTER_VALIDATE_EMAIL)) {
+        ob_end_clean();
         echo json_encode(['success' => false, 'error' => 'Invalid email address.']);
         exit;
     }
     if (strlen($username_in) < 3 || strlen($username_in) > 32) {
+        ob_end_clean();
         echo json_encode(['success' => false, 'error' => 'Username must be 3-32 characters.']);
         exit;
     }
     if (strlen($password_in) < 6) {
+        ob_end_clean();
         echo json_encode(['success' => false, 'error' => 'Password must be at least 6 characters.']);
         exit;
     }
@@ -38,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_SERVER['HTTP_ACCEPT']) || s
         $stmt = $pdo->prepare("SELECT player_id FROM players WHERE username = ? OR email = ? LIMIT 1");
         $stmt->execute([$username_in, $email_in]);
         if ($stmt->fetch()) {
+            ob_end_clean();
             echo json_encode(['success' => false, 'error' => 'Username or email already exists.']);
             exit;
         }
@@ -46,8 +53,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_SERVER['HTTP_ACCEPT']) || s
         $display_name = $username_in;
         $stmt = $pdo->prepare("INSERT INTO players (username, password_hash, display_name, email) VALUES (?, ?, ?, ?)");
         $stmt->execute([$username_in, $password_hash, $display_name, $email_in]);
+        ob_end_clean();
         echo json_encode(['success' => true]);
     } catch (PDOException $e) {
+        ob_end_clean();
         echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
     }
     exit;
