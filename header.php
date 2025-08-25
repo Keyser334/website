@@ -76,6 +76,7 @@
                 <li><a href="#">Resources</a></li>
                 <li><a href="#">Fleet</a></li>
                 <li><a href="#">Planets</a></li>
+                <li><a href="#">Skills</a></li>
                 <li><a href="#">Account</a></li>
             </ul>
         </nav>
