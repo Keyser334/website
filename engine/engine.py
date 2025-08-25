@@ -1,4 +1,13 @@
 import time
+import mysql.connector
+
+# Create the connection once, outside the game_tick function
+db_connection = mysql.connector.connect(
+    host="185.213.26.79",
+    user="clyde",
+    password="PurpleHorse@01",
+    database="mcg_test"
+)
 
 class GameEngine:
 	def game_tick(self):
@@ -6,7 +15,7 @@ class GameEngine:
 		print("Game tick!")
 	def update_resources(self):
 		# Placeholder for resource update logic
-		print("Updating resources.123")
+		print("Updating resources.124")
 	def __init__(self):
 		self.running = True
 
