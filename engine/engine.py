@@ -1,6 +1,6 @@
 import time
 import mysql.connector
-print("start3")
+print("start4")
 # Create the connection once, outside the game_tick function
 db_connection = mysql.connector.connect(
     host="185.213.26.79",
