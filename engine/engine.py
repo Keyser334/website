@@ -11,7 +11,7 @@ db_connection = mysql.connector.connect(
 
 class GameEngine:
 	def game_tick(self):
-        print("new")
+        print("new2")
 		# Logic to execute every game tick (1 second)
 		print("Game tick!")
 	def update_resources(self):
