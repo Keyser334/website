@@ -285,6 +285,7 @@ try {
     <!-- Main dashboard section (single instance) -->
     <?php if (isset($_SESSION['username'])): ?>
     <div class="container">
+    echo"test";    
     <!-- Header is now included from header.php -->
         <div class="realtime-section">
             <h2 class="section-title">
@@ -318,8 +319,8 @@ try {
             </div>
             <div class="update-status">
                 <span class="status-indicator"></span>
-                <span id="update-text">Real-time updates active</span>
-                <span id="last-update">Last updated: <?php echo date('H:i:s'); ?></span>
+                <span id="update-text">Real-time updates active 1.02<br></span>
+                <span id="last-update">Last updatedz: <?php echo date('H:i:s'); ?></span>
             </div>
         </div>
     </div>

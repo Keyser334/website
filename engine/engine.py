@@ -1,9 +1,8 @@
 import sys
 import time
-import mysql.connector
+import pymysql
 
-# Create the connection once, outside the game_tick function
-db_connection = mysql.connector.connect(
+db_connection = pymysql.connect(
     host="185.213.26.79",
     user="clyde",
     password="PurpleHorse@01",
@@ -21,6 +20,9 @@ class GameEngine:
         print(player_array)
         for player in player_array:
             player_id = player[0]
+            self.update_resources(player_id)
+    def update_resources(player_id):
+            print('in update resources')
             try:
                 cursor = db_connection.cursor()
                 cursor.execute("UPDATE player_resources SET quantity = quantity + 10 WHERE player_id = %s", (player_id,))
@@ -31,10 +33,6 @@ class GameEngine:
             finally:
                 if 'cursor' in locals():
                     cursor.close()
-    def update_resources(self):
-        # Placeholder for resource update logic
-        #print("Updating resources.124")
-        pass
     def __init__(self):
         self.running = True
         
@@ -45,7 +43,8 @@ class GameEngine:
 
     def update(self):
         # Placeholder for game logic update
-        self.update_resources()
+        #self.update_resources()
+        pass
 
     def render(self):
         # Placeholder for rendering
@@ -63,6 +62,7 @@ class GameEngine:
             #one second timer
             if current_time - last_tick >= 1.0:
                 self.second_tick()
+                self.minute_tick()
                 #print("One second has passed!")
                 last_tick = current_time
             # One minute timer
